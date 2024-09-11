@@ -1,0 +1,5 @@
+apscheduler==3.10.4
+Flask==3.0.3
+httpx==0.27.2
+ics==0.7.2
+python_dateutil==2.9.0.post0
