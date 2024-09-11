@@ -1,4 +1,6 @@
+import logging
 import os
+import sys
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, make_response
@@ -7,6 +9,13 @@ import managers.auth as auth_manager
 import managers.calendar as calendar_manager
 
 FETCH_INTERVAL_MINUTES = int(os.environ.get("FETCH_INTERVAL_MINUTES", 60))
+
+logging.basicConfig(
+    datefmt="%Y-%m-%d %H:%M:%S",
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    level=logging.INFO,
+    stream=sys.stdout,
+)
 
 scheduler = BackgroundScheduler()
 
@@ -35,6 +44,7 @@ def _fetch_calendar() -> str:
 
     with open("calendar.ics", "w") as file:
         file.write(calendar_ics)
+        logging.info("Updated calendar.ics")
 
     return calendar_ics
 
@@ -51,6 +61,7 @@ def calendar():
     response.headers["Content-Type"] = "text/calendar"
     response.headers["Content-Disposition"] = "attachment; filename=calendar.ics"
 
+    logging.info("Served calendar.ics")
     return response
 
 

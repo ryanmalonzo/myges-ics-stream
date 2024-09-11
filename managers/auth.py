@@ -18,7 +18,7 @@ def get_credentials() -> dict:
     if username is None or password is None:
         raise ValueError("Missing username or password")
 
-    logging.info(f"Retrieved username {username} and password {password}")
+    logging.debug(f"Retrieved username {username} and password {password}")
     return {"username": username, "password": password}
 
 
@@ -83,6 +83,6 @@ def login(username, password) -> str:
             file,
         )
 
-    logging.info(f"Received access token {access_token}")
-    logging.info(f"Toekn expires in {expires_in} seconds")
+    logging.debug(f"Received access token {access_token}")
+    logging.debug(f"Token expires in {expires_in} seconds")
     return access_token
