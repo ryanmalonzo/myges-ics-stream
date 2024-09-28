@@ -5,26 +5,20 @@ from dateutil.relativedelta import relativedelta
 from ics import Calendar, Event
 
 
-def get_date_range(months_offset=0):
+def get_date_range():
     """
-    Calculate the first and last millisecond timestamps of a month.
-
-    Args:
-        months_offset (int): Number of months to offset from the current month. Default is 0.
+    Calculate the millisecond timestamps for the current date and the date 1 month from now.
 
     Returns:
-        tuple: Two millisecond timestamps (first_day, last_day) of the month.
+        tuple: Two millisecond timestamps (first_day_ms, last_day_ms).
     """
-    # Get the first day of the target month
-    first_day = datetime.datetime.today().replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0
+    # Get the current date
+    first_day = datetime.datetime.now().replace(
+        hour=0, minute=0, second=0, microsecond=0
     )
-    first_day += relativedelta(months=months_offset)
 
-    # Calculate the last day of the target month
-    next_month = first_day + relativedelta(months=1)
-    last_day = next_month - datetime.timedelta(days=1)
-    last_day = last_day.replace(hour=23, minute=59, second=59, microsecond=999999)
+    # Calculate the date 1 month from now
+    last_day = first_day + relativedelta(months=1)
 
     # Convert to millisecond timestamps
     first_day_ms = int(first_day.timestamp() * 1000)
