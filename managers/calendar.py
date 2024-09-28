@@ -92,7 +92,13 @@ def convert_to_ics(event_list: list) -> str:
         begin = datetime.datetime.fromtimestamp(event["start_date"] / 1000)
         end = datetime.datetime.fromtimestamp(event["end_date"] / 1000)
 
-        event = Event(name=event["name"], description=description, begin=begin, end=end)
+        event = Event(
+            name=event["name"],
+            description=description,
+            begin=begin,
+            end=end,
+            created=datetime.datetime.now(),
+        )
         calendar.events.add(event)
 
     return calendar.serialize()
