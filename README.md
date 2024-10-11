@@ -30,6 +30,11 @@ services:
     restart: unless-stopped
 ```
 
+## Usage
+
+By default, the calendar will be available on port `8080`, at `/calendar`.  
+If running locally, an example URL would be `http://localhost:8080/calendar` or `http://<local-ip>:8080/calendar`.  
+
 ## Environment variables
 
 | Environment variable   | Description                                                                                                                                  | Example value | Required? |
