@@ -1,8 +1,9 @@
 import datetime
+import uuid
 
 import httpx
 from dateutil.relativedelta import relativedelta
-from ics import Calendar, Event
+from icalendar import Calendar, Event, vDatetime
 
 
 def get_date_range():
@@ -56,7 +57,7 @@ def fetch_calendar(access_token: str, first_day_ms: int, last_day_ms: int):
     return response.json()
 
 
-def convert_to_ics(event_list: list) -> str:
+def convert_to_ical(event_list: list) -> bytes:
     """
     Converts the calendar events to an ICS file.
 
@@ -67,6 +68,8 @@ def convert_to_ics(event_list: list) -> str:
         str: ICS file content.
     """
     calendar = Calendar()
+    calendar["version"] = "2.0"
+    calendar["prodid"] = "-//Skolae//Calendar//FR"
 
     for event in event_list:
         campuses = (
@@ -86,13 +89,18 @@ def convert_to_ics(event_list: list) -> str:
         begin = datetime.datetime.fromtimestamp(event["start_date"] / 1000)
         end = datetime.datetime.fromtimestamp(event["end_date"] / 1000)
 
-        event = Event(
-            name=event["name"],
-            description=description,
-            begin=begin,
-            end=end,
-            created=datetime.datetime.now(),
-        )
-        calendar.events.add(event)
+        event_ical = Event()
+        event_ical["uid"] = uuid.uuid4()
+        event_ical["summary"] = event["name"]
+        event_ical["description"] = description
+        event_ical["dtstart"] = vDatetime(begin)
+        event_ical["dtend"] = vDatetime(end)
+        event_ical["dtstamp"] = vDatetime(datetime.datetime.now())
 
-    return calendar.serialize()
+        calendar.add_component(event_ical)
+
+    return calendar.to_ical()
+
+
+def from_ical(file: str) -> bytes:
+    return Calendar.from_ical(file).to_ical()
