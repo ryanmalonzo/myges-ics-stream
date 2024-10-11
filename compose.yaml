@@ -5,8 +5,9 @@ services:
       dockerfile: Dockerfile
     container_name: myges-ics-stream
     environment:
-      FETCH_INTERVAL_MINUTES: ${FETCH_INTERVAL_MINUTES:-60} 
       MYGES_USERNAME: ${MYGES_USERNAME}
       MYGES_PASSWORD: ${MYGES_PASSWORD}
+      FETCH_INTERVAL_MINUTES: ${FETCH_INTERVAL_MINUTES:-60} 
+      TIMEZONE: ${TIMEZONE:-Europe/Paris}
     ports:
       - "8080:8080"
