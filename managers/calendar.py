@@ -7,7 +7,7 @@ from dateutil import tz
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar, Event, vDatetime
 
-TIMEZONE = os.environ.get("TIMEZONE", "Europe/Paris")
+TIMEZONE = os.environ.get("TIMEZONE", "Etc/UTC")
 
 
 def get_date_range():
