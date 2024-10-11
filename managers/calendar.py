@@ -1,9 +1,13 @@
-import datetime
+import os
 import uuid
+from datetime import datetime
 
 import httpx
+from dateutil import tz
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar, Event, vDatetime
+
+TIMEZONE = os.environ.get("TIMEZONE", "Europe/Paris")
 
 
 def get_date_range():
@@ -14,9 +18,7 @@ def get_date_range():
         tuple: Two millisecond timestamps (first_day_ms, last_day_ms).
     """
     # Get the current date
-    first_day = datetime.datetime.now().replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
+    first_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     # Calculate the date 1 month from now
     last_day = first_day + relativedelta(months=1)
@@ -68,8 +70,10 @@ def convert_to_ical(event_list: list) -> bytes:
         str: ICS file content.
     """
     calendar = Calendar()
-    calendar["version"] = "2.0"
-    calendar["prodid"] = "-//Skolae//Calendar//FR"
+    calendar.add("version", "2.0")
+    calendar.add("prodid", "-//Skolae//Calendar//FR")
+
+    timezone = tz.gettz(TIMEZONE)
 
     for event in event_list:
         campuses = (
@@ -86,16 +90,17 @@ def convert_to_ical(event_list: list) -> bytes:
         )
         description = f"{campuses}\n" f"{rooms}\n" f"{event['teacher']}\n"
 
-        begin = datetime.datetime.fromtimestamp(event["start_date"] / 1000)
-        end = datetime.datetime.fromtimestamp(event["end_date"] / 1000)
+        begin = datetime.fromtimestamp(event["start_date"] / 1000, tz=timezone)
+        end = datetime.fromtimestamp(event["end_date"] / 1000, tz=timezone)
+        now = datetime.now(tz=timezone)
 
         event_ical = Event()
-        event_ical["uid"] = uuid.uuid4()
-        event_ical["summary"] = event["name"]
-        event_ical["description"] = description
-        event_ical["dtstart"] = vDatetime(begin)
-        event_ical["dtend"] = vDatetime(end)
-        event_ical["dtstamp"] = vDatetime(datetime.datetime.now())
+        event_ical.add("uid", uuid.uuid4())
+        event_ical.add("summary", event["name"])
+        event_ical.add("description", description)
+        event_ical.add("dtstart", vDatetime(begin))
+        event_ical.add("dtend", vDatetime(end))
+        event_ical.add("dtstamp", vDatetime(now))
 
         calendar.add_component(event_ical)
 
