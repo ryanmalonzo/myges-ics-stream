@@ -47,6 +47,13 @@ If running locally, an example URL would be `http://localhost:8080/calendar` or 
 > [!IMPORTANT]  
 > In most cases, `Etc/UTC` should be the right value regardless of where you actually live. Instead, you should set the correct timezone in your calendar app settings.
 
+## Troubleshooting
+
+### Cloudflare
+
+The subscription URL will not work if the DNS record is proxied through Cloudflare.  
+To avoid this, Bot Fight Mode needs to be turned off in Security > Bots.
+
 ## Acknowledgements
 
 - [UnBonWhisky/myges-to-icalendar](https://github.com/UnBonWhisky/myges-to-icalendar) for the API endpoints.
