@@ -49,7 +49,7 @@ If running locally, an example URL would be `http://localhost:8080/calendar` or 
 
 ## Troubleshooting
 
-### Cloudflare
+### Google Calendar
 
 The subscription URL will not work if the DNS record is proxied through Cloudflare.  
 To avoid this, Bot Fight Mode needs to be turned off in Security > Bots.
