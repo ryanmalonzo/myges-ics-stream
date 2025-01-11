@@ -20,8 +20,8 @@ def get_date_range():
     # Get the current date
     first_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
-    # Calculate the date 1 month from now
-    last_day = first_day + relativedelta(months=1)
+    # Calculate the date 3 months from now
+    last_day = first_day + relativedelta(months=3)
 
     # Convert to millisecond timestamps
     first_day_ms = int(first_day.timestamp() * 1000)
