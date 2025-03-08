@@ -1,12 +1,14 @@
 import logging
 import os
+import signal
 import sys
-
-from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, Response
+import threading
 
 import managers.auth as auth_manager
 import managers.calendar as calendar_manager
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask, Response
+from waitress.server import create_server
 
 FETCH_INTERVAL_MINUTES = int(os.environ.get("FETCH_INTERVAL_MINUTES", 60))
 
@@ -20,6 +22,26 @@ logging.basicConfig(
 scheduler = BackgroundScheduler()
 
 app = Flask(__name__)
+
+server = None
+shutdown_event = threading.Event()
+
+
+def signal_handler(signum, frame):
+    """
+    Handle interruption signals.
+    """
+    logging.info(f"Received signal {signum}. Shutting down gracefully...")
+
+    # Shut down the scheduler
+    if scheduler.running:
+        scheduler.shutdown(wait=False)
+        logging.info("Scheduler shut down")
+
+    # Signal the server to stop
+    if server:
+        shutdown_event.set()
+        logging.info("Server shutdown requested")
 
 
 @scheduler.scheduled_job("interval", minutes=FETCH_INTERVAL_MINUTES)
@@ -66,8 +88,32 @@ def calendar():
     return response
 
 
+def run_server():
+    """Run the server in a way that can be gracefully shut down."""
+    global server
+    server = create_server(app, host="0.0.0.0", port=8080)
+
+    # Start the server
+    logging.info("Starting server on port 8080")
+    threading.Thread(target=server.run).start()
+
+    # Wait for shutdown event
+    shutdown_event.wait()
+
+    # Close server
+    server.close()
+    logging.info("Server has been shut down")
+
+
 if __name__ == "__main__":
-    from waitress import serve
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
 
     scheduler.start()
-    serve(app, host="0.0.0.0", port=8080)
+    logging.info("Scheduler started")
+
+    # Run the server
+    run_server()
+
+    logging.info("Exiting application")
+    sys.exit(0)
